@@ -1,4 +1,7 @@
-use solana_program::program_pack::{Sealed, IsInitialized};
+use solana_program::{
+    program_pack::{IsInitialized, Sealed},
+    pubkey::Pubkey,
+};
 
 use borsh::{BorshSerialize, BorshDeserialize};
 
@@ -7,7 +10,8 @@ pub struct MovieAccountState {
     pub is_initialized: bool,
     pub rating: u8,
     pub title: String,
-    pub description: String  
+    pub description: String,
+    pub reviewer: Pubkey,
 }
 
 
