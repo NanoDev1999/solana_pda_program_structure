@@ -17,7 +17,11 @@ use borsh::BorshSerialize;
 
 use crate::instruction::MovieInstruction;
 
-use crate::state::MovieAccountState;
+use crate::state::{
+    MovieAccountState, 
+    MovieCommentCounter, 
+    MovieComment
+};
 
 use crate::error::ReviewError;
 
@@ -34,21 +38,29 @@ pub fn process_instruction(
     let instruction = MovieInstruction::unpack(instruction_data)?;
     // Match against the data struct returned into `instruction` variable
     match instruction {
-        MovieInstruction::AddMovieReview { title, rating, description } => {
+
+        MovieInstruction::AddMovieReview { title, rating, description } => 
+        {
             // Make a call to `add_move_review` function
             let add_movie_review_result = add_movie_review(program_id, accounts, title, rating, description);
             msg!("add_movie_review_result: {:?}", add_movie_review_result);
         },
+
         // add UpdateMovieReview to match against our new data structure
-        MovieInstruction::UpdateMovieReview { title, rating, description } => {
-            // make call to update function that we'll define next
+        MovieInstruction::UpdateMovieReview { title, rating, description } => 
+        {
+            // make call to update function
             let update_movie_review_result = update_movie_review(program_id, accounts, title, rating, description);
             msg!("update_movie_review_result: {:?}", update_movie_review_result);
+        },
+
+        MovieInstruction::AddComment { comment } => 
+        {
+            // make call to add_comment function 
+            let add_comment_result = add_comment(program_id, accounts, comment);
+            msg!("add_comment_result: {:?}", add_comment_result);
         }
     }
-
-
-
 
     Ok(())
 }

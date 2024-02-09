@@ -8,10 +8,15 @@ pub enum MovieInstruction {
         rating: u8,
         description: String
     },
+
     UpdateMovieReview {
         title: String,
         rating: u8,
         description: String
+    },
+
+    AddComment {
+        comment: String
     }
 }
 
@@ -25,26 +30,48 @@ struct MovieReviewPayload {
 }
 
 
+#[derive(BorshDeserialize)]
+struct CommentPayload {
+    comment: String
+}
+
+
 impl MovieInstruction {
     // Unpack inbound buffer to associated Instruction
     // The expected format for input is a Borsh serialized vector
     pub fn unpack(input: &[u8]) -> Result<Self, ProgramError> {
         // Split the first byte of data
         let (&variant, rest) = input.split_first().ok_or(ProgramError::InvalidInstructionData)?;
-        // `try_from_slice` is one of the implementations from the BorshDeserialization trait
-        // Deserializes instruction byte data into the payload struct
-        let payload = MovieReviewPayload::try_from_slice(rest).unwrap();
-        // Match the first byte and return the AddMovieReview struct
+
         Ok(match variant {
-            0 => Self::AddMovieReview {
-                title: payload.title,
-                rating: payload.rating,
-                description: payload.description 
+            0 => {
+                let payload = MovieReviewPayload::try_from_slice(rest).unwrap();
+                Self::AddMovieReview 
+                {
+                    title: payload.title,
+                    rating: payload.rating,
+                    description: payload.description
+                }
             },
-            1 => Self::UpdateMovieReview {
-                title: payload.title,
-                rating: payload.rating,
-                description: payload.description },
+
+            1 => {
+                let payload = MovieReviewPayload::try_from_slice(rest).unwrap();
+                Self::UpdateMovieReview 
+                {
+                    title: payload.title,
+                    rating: payload.rating,
+                    description: payload.description
+                }
+            },
+
+            2 => {
+                let payload = CommentPayload::try_from_slice(rest).unwrap();
+                Self::AddComment 
+                {
+                    comment: payload.comment
+                }
+            },
+
             _ => return Err(ProgramError::InvalidInstructionData)
         })
     }
