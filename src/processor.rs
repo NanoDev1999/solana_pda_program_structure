@@ -1,5 +1,14 @@
 use solana_program::{
-    account_info::{next_account_info, AccountInfo}, borsh1::try_from_slice_unchecked, entrypoint::{self, ProgramResult}, msg, program::invoke_signed, program_error::ProgramError, program_pack::IsInitialized, pubkey::Pubkey, system_instruction, sysvar::{rent::Rent, Sysvar}
+    account_info::{next_account_info, AccountInfo}, 
+    borsh1::try_from_slice_unchecked, 
+    entrypoint::ProgramResult, 
+    msg, 
+    program::invoke_signed, 
+    program_error::ProgramError, 
+    program_pack::IsInitialized, 
+    pubkey::Pubkey, 
+    system_instruction, 
+    sysvar::{rent::Rent, Sysvar}
 };
 
 use std::convert::TryInto;
@@ -33,7 +42,8 @@ pub fn process_instruction(
         // add UpdateMovieReview to match against our new data structure
         MovieInstruction::UpdateMovieReview { title, rating, description } => {
             // make call to update function that we'll define next
-            update_movie_review(program_id, accounts, title, rating, description);
+            let update_movie_review_result = update_movie_review(program_id, accounts, title, rating, description);
+            msg!("update_movie_review_result: {:?}", update_movie_review_result);
         }
     }
 
@@ -195,6 +205,7 @@ pub fn update_movie_review(
 
 
     if pda_account.owner != program_id {
+        msg!("Illegal Owner");
         return Err(ProgramError::IllegalOwner);
     }
 
